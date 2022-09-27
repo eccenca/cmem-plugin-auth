@@ -1,4 +1,5 @@
 """Random values workflow plugin module"""
+import collections
 from typing import Sequence, Iterator, Dict, Any
 
 from cmem_plugin_base.dataintegration.context import ExecutionContext
@@ -9,9 +10,16 @@ from cmem_plugin_base.dataintegration.entity import (
     EntitySchema,
     EntityPath,
 )
+from cmem_plugin_base.dataintegration.parameter.choice import ChoiceParameterType
 from cmem_plugin_base.dataintegration.plugins import WorkflowPlugin
-from oauthlib.oauth2 import BackendApplicationClient
+from oauthlib.oauth2 import BackendApplicationClient, LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
+
+CLIENT_CREDENTIALS = BackendApplicationClient.grant_type
+PASSWORD_GRANT = LegacyApplicationClient.grant_type
+GRANT_TYPE = collections.OrderedDict(
+    {CLIENT_CREDENTIALS: "Client Credentials", PASSWORD_GRANT: "Password Grant"}
+)
 
 
 @Plugin(
@@ -20,43 +28,72 @@ from requests_oauthlib import OAuth2Session
     documentation="""Generates access token using OAuth2""",
     parameters=[
         PluginParameter(
+            name="oauth_grant_type",
+            label="Grant type",
+            description="OAuth grant type",
+            param_type=ChoiceParameterType(GRANT_TYPE),
+        ),
+        PluginParameter(
             name="oauth_token_url",
             label="Token endpoint URL",
-            description="Token endpoint URL, must use HTTPS.",
+            description="Token endpoint URL, must use HTTPS",
         ),
         PluginParameter(
             name="oauth_client_id",
             label="Client Id",
             description="Client id obtained during registration",
+            default_value="",
         ),
         PluginParameter(
             name="oauth_client_secret",
-            label="Values (Columns)",
-            description="Client id obtained during registration",
+            label="Client Secret",
+            description="Client secret obtained during registration",
+            default_value="",
+        ),
+        PluginParameter(
+            name="user_name", label="Username", description="Username", default_value=""
+        ),
+        PluginParameter(
+            name="password", label="Password", description="Password", default_value=""
         ),
     ],
 )
 class OAuth2(WorkflowPlugin):
     """Workflow Plugin: Generate oauth access token"""
 
+    # pylint: disable=too-many-arguments
     def __init__(
-        self, oauth_token_url: str, oauth_client_id: str, oauth_client_secret: str
+        self,
+        oauth_grant_type: str,
+        oauth_token_url: str,
+        oauth_client_id: str,
+        oauth_client_secret: str,
+        user_name: str,
+        password: str,
     ) -> None:
         self.oauth_token_url: str = oauth_token_url
         self.oauth_client_id: str = oauth_client_id
         self.oauth_client_secret: str = oauth_client_secret
+        self.oauth_grant_type: str = oauth_grant_type
+        self.user_name: str = user_name
+        self.password: str = password
         self.token: Dict[str, Any] = {}
 
     def execute(
         self, inputs: Sequence[Entities], context: ExecutionContext
     ) -> Entities:
         self.log.info("Start creating access token.")
-        client = BackendApplicationClient(client_id=self.oauth_client_id)
+        if self.oauth_grant_type == CLIENT_CREDENTIALS:
+            client = BackendApplicationClient(client_id=self.oauth_client_id)
+        else:
+            client = LegacyApplicationClient(client_id=self.oauth_client_id)
         oauth = OAuth2Session(client=client)
         self.token = oauth.fetch_token(
             token_url=self.oauth_token_url,
             client_id=self.oauth_client_id,
             client_secret=self.oauth_client_secret,
+            username=self.user_name,
+            password=self.password,
         )
         return self.get_or_create_entities(inputs)
 
