@@ -1,4 +1,4 @@
-"""Random values workflow plugin module"""
+"""OAuth2 token generator workflow plugin module"""
 import collections
 from typing import Sequence, Iterator, Dict, Any
 
@@ -32,6 +32,7 @@ GRANT_TYPE = collections.OrderedDict(
             label="Grant type",
             description="OAuth grant type",
             param_type=ChoiceParameterType(GRANT_TYPE),
+            default_value=CLIENT_CREDENTIALS,
         ),
         PluginParameter(
             name="oauth_token_url",
