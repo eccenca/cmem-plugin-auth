@@ -21,41 +21,77 @@ GRANT_TYPE = collections.OrderedDict(
     {CLIENT_CREDENTIALS: "Client Credentials", PASSWORD_GRANT: "Password Grant"}
 )
 
+HEADLINE = "Provide an OAuth2 access token for other tasks (via config port)."
+
+DOCUMENTATION = f"""{HEADLINE}
+
+This task uses the provided client or user credentials and runs an OAuth2
+authorization to the given service URL. It will fetch the output and provide the
+token in a way that it can be used by other tasks to access the service.
+
+Note: The consuming task needs to have the parameter `oauth_access_token` in order to
+to use the output this task. You need to connect this task to the
+**config port** of the consuming task.
+"""
+
+GRANT_TYPE_DESCRIPTION = """Select the used OAuth Grant Type in order to
+specify how this plugin gets a valid token.
+
+Depending on the value of this parameter, other authentication related parameter
+will become mandatory or obsolete. The following values can be used:
+
+- `client_credentials`: - this refers to the OAuth 2.0 Client Credentials Grant Type.
+Mandatory parameter for this grant type are Client ID and Client Secret.
+- `password` - this refers to the OAuth 2.0 Password Grant Type. Mandatory variables
+for this grant type are Client ID, User name and Password.
+"""
+
+# nosec
+OIDC = "OpenID Connect (OIDC) OAuth 2.0"
+OAUTH_TOKEN_DESCRIPTION = f"""This is the {OIDC} token endpoint location
+(a HTTP(S) URL)."""
+
 
 @Plugin(
-    label="Access token Generator",
-    description="Generates access token using OAuth2",
-    documentation="""Generates access token using OAuth2""",
+    label="OAuth2 Authentication",
+    description=HEADLINE,
+    documentation=DOCUMENTATION,
     parameters=[
         PluginParameter(
             name="oauth_grant_type",
-            label="Grant type",
-            description="OAuth grant type",
+            label="Grant Type",
+            description=GRANT_TYPE_DESCRIPTION,
             param_type=ChoiceParameterType(GRANT_TYPE),
             default_value=CLIENT_CREDENTIALS,
         ),
         PluginParameter(
             name="oauth_token_url",
-            label="Token endpoint URL",
-            description="Token endpoint URL, must use HTTPS",
+            label="Token Endpoint",
+            description=OAUTH_TOKEN_DESCRIPTION,
         ),
         PluginParameter(
             name="oauth_client_id",
-            label="Client Id",
-            description="Client id obtained during registration",
+            label="Client ID",
+            description="The Client ID obtained during registration.",
             default_value="",
         ),
         PluginParameter(
             name="oauth_client_secret",
             label="Client Secret",
-            description="Client secret obtained during registration",
+            description="The Client Secret obtained during registration.",
             default_value="",
         ),
         PluginParameter(
-            name="user_name", label="Username", description="Username", default_value=""
+            name="user_name",
+            label="Username",
+            description="The user account name used for authentication.",
+            default_value=""
         ),
         PluginParameter(
-            name="password", label="Password", description="Password", default_value=""
+            name="password",
+            label="Password",
+            description="The user account password.",
+            default_value=""
         ),
     ],
 )
