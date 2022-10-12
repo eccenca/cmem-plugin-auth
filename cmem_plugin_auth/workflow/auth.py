@@ -85,13 +85,13 @@ OAUTH_TOKEN_DESCRIPTION = f"""This is the {OIDC} token endpoint location
             name="user_name",
             label="Username",
             description="The user account name used for authentication.",
-            default_value=""
+            default_value="",
         ),
         PluginParameter(
             name="password",
             label="Password",
             description="The user account password.",
-            default_value=""
+            default_value="",
         ),
     ],
 )
