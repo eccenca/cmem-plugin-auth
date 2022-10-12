@@ -1,8 +1,9 @@
 # Changes here will be overwritten by Copier
 _commit: v3.3.2
 _src_path: gh:eccenca/cmem-plugin-template
-author_mail: saipraneeth@aarth.io
-author_name: Saipraneeth
-project_description: This plugin uses OAuth2 to generate access token.
+author_mail: cmempy-developer@eccenca.com
+author_name: eccenca GmbH
+project_description: Authenticate to services and provide the OAuth2 access token
+    for other tasks.
 project_slug: auth
 

@@ -2,8 +2,8 @@
 name = "cmem-plugin-auth"
 version = "0.0.0"
 license = "Apache-2.0"
-description = "This plugin uses OAuth2 to generate access token."
-authors = ["Saipraneeth M <saipraneeth@aarth.io>"]
+description = "Authenticate to services and provide the OAuth2 access token for other tasks."
+authors = ["eccenca GmbH <cmempy-developer@eccenca.com>"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Plugins",

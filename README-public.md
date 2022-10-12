@@ -1,6 +1,6 @@
 # cmem-plugin-auth
 
-This plugin uses OAuth2 to generate access token.
+Authenticate to services and provide the OAuth2 access token for other tasks.
 
 This is a plugin for [eccenca](https://eccenca.com) [Corporate Memory](https://documentation.eccenca.com).
 
