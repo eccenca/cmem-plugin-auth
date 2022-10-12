@@ -96,7 +96,8 @@ class OAuth2(WorkflowPlugin):
             username=self.user_name,
             password=self.password,
         )
-        return self.get_or_create_entities(inputs)
+
+        return self.get_or_create_entities([])
 
     def get_or_create_entities(self, inputs: Sequence[Entities]) -> Entities:
         """
