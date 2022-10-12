@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cmem-plugin-auth"
-version = "0.0.0+dirty"
+version = "0.0.0"
 license = "Apache-2.0"
 description = "This plugin uses OAuth2 to generate access token."
 authors = ["Saipraneeth M <saipraneeth@aarth.io>"]
