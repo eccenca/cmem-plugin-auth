@@ -132,8 +132,14 @@ class OAuth2(WorkflowPlugin):
             username=self.user_name,
             password=self.password,
         )
-
-        return self.get_or_create_entities([])
+        context.report.update(
+            ExecutionReport(
+                entity_count=1,
+                operation_desc="token received",
+                operation="read",
+            )
+        )
+        return self.get_or_create_entities(inputs)
 
     def get_or_create_entities(self, inputs: Sequence[Entities]) -> Entities:
         """
