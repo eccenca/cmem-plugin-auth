@@ -2,7 +2,7 @@
 import collections
 from typing import Sequence, Iterator, Dict, Any
 
-from cmem_plugin_base.dataintegration.context import ExecutionContext
+from cmem_plugin_base.dataintegration.context import ExecutionContext, ExecutionReport
 from cmem_plugin_base.dataintegration.description import Plugin, PluginParameter
 from cmem_plugin_base.dataintegration.entity import (
     Entities,
