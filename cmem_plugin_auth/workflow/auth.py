@@ -2,7 +2,7 @@
 import collections
 from typing import Sequence, Iterator, Dict, Any
 
-from cmem_plugin_base.dataintegration.context import ExecutionContext
+from cmem_plugin_base.dataintegration.context import ExecutionContext, ExecutionReport
 from cmem_plugin_base.dataintegration.description import Plugin, PluginParameter
 from cmem_plugin_base.dataintegration.entity import (
     Entities,
@@ -132,8 +132,14 @@ class OAuth2(WorkflowPlugin):
             username=self.user_name,
             password=self.password,
         )
-
-        return self.get_or_create_entities([])
+        context.report.update(
+            ExecutionReport(
+                entity_count=1,
+                operation_desc="token received",
+                operation="read",
+            )
+        )
+        return self.get_or_create_entities(inputs)
 
     def get_or_create_entities(self, inputs: Sequence[Entities]) -> Entities:
         """
