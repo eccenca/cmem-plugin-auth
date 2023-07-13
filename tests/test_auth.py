@@ -8,9 +8,8 @@ from cmem.cmempy.workspace.projects.resources.resource import (
     create_resource,
     get_resource_response,
 )
-from cmem_plugin_base.dataintegration.context import ExecutionContext, ExecutionReport
 
-from tests.utils import TestExecutionContext, needs_cmem
+from tests.utils import needs_cmem
 
 PROJECT_NAME = "auth_test_project"
 DATASET_NAME = "sample_dataset"
