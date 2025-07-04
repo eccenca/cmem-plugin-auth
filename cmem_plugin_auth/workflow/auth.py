@@ -1,14 +1,16 @@
 """OAuth2 token generator workflow plugin module"""
+
 import collections
-from typing import Sequence, Iterator, Dict, Any
+from collections.abc import Iterator, Sequence
+from typing import Any
 
 from cmem_plugin_base.dataintegration.context import ExecutionContext
 from cmem_plugin_base.dataintegration.description import Plugin, PluginParameter
 from cmem_plugin_base.dataintegration.entity import (
     Entities,
     Entity,
-    EntitySchema,
     EntityPath,
+    EntitySchema,
 )
 from cmem_plugin_base.dataintegration.parameter.choice import ChoiceParameterType
 from cmem_plugin_base.dataintegration.plugins import WorkflowPlugin
@@ -98,8 +100,7 @@ OAUTH_TOKEN_DESCRIPTION = f"""This is the {OIDC} token endpoint location
 class OAuth2(WorkflowPlugin):
     """Workflow Plugin: Generate oauth access token"""
 
-    # pylint: disable=too-many-arguments
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         oauth_grant_type: str,
         oauth_token_url: str,
@@ -114,11 +115,11 @@ class OAuth2(WorkflowPlugin):
         self.oauth_grant_type: str = oauth_grant_type
         self.user_name: str = user_name
         self.password: str = password
-        self.token: Dict[str, Any] = {}
+        self.token: dict[str, Any] = {}
 
-    def execute(
-        self, inputs: Sequence[Entities], context: ExecutionContext
-    ) -> Entities:
+    def execute(self, inputs: Sequence[Entities], context: ExecutionContext) -> Entities:
+        """Execute the workflow task"""
+        _ = inputs, context
         self.log.info("Start creating access token.")
         if self.oauth_grant_type == CLIENT_CREDENTIALS:
             client = BackendApplicationClient(client_id=self.oauth_client_id)
@@ -136,15 +137,15 @@ class OAuth2(WorkflowPlugin):
         return self.get_or_create_entities([])
 
     def get_or_create_entities(self, inputs: Sequence[Entities]) -> Entities:
-        """
-        if exists append oauth access token to first entity or
-        create new one wth oauth access token path
+        """Get or create entities
+
+        If exists append oauth access token to the first entity or create a new one with
+        an oauth access token path
         """
         entity = None
-        if inputs:
-            if inputs[0].entities:
-                entity = next(self.get_entities(inputs[0]))
-                schema = self.clone_schema(inputs[0].schema)
+        if inputs and inputs[0].entities:
+            entity = next(self.get_entities(inputs[0]))
+            schema = self.clone_schema(inputs[0].schema)
         if not entity:
             schema = EntitySchema(
                 type_uri="https://eccenca.com/plugin/auth",
@@ -168,15 +169,11 @@ class OAuth2(WorkflowPlugin):
     def clone_entity(self, entity: Entity) -> Entity:
         """Clone java entity to python entity"""
         self.log.info("Clone java entity to python entity")
-        values = []
-        for value in entity.values:
-            values.append(value)
+        values = list(entity.values)
         return Entity(uri=entity.uri, values=values)
 
     def clone_schema(self, schema: EntitySchema) -> EntitySchema:
         """Clone java schema to python schema"""
         self.log.info("Clone java schema to python schema")
-        paths = []
-        for path in schema.paths:
-            paths.append(path)
+        paths = list(schema.paths)
         return EntitySchema(type_uri=schema.type_uri, paths=paths)
