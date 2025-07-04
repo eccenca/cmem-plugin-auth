@@ -1,5 +1,9 @@
 """Plugin tests."""
+
 import io
+import os
+from collections.abc import Generator
+from typing import Any
 
 import pytest
 from cmem.cmempy.workspace.projects.datasets.dataset import make_new_dataset
@@ -9,7 +13,9 @@ from cmem.cmempy.workspace.projects.resources.resource import (
     get_resource_response,
 )
 
-from tests.utils import needs_cmem
+needs_cmem = pytest.mark.skipif(
+    os.environ.get("CMEM_BASE_URI", "") == "", reason="Needs CMEM configuration"
+)
 
 PROJECT_NAME = "auth_test_project"
 DATASET_NAME = "sample_dataset"
@@ -18,8 +24,8 @@ DATASET_TYPE = "text"
 
 
 @pytest.fixture
-def setup(request):
-    """Provides the DI build project incl. assets."""
+def setup() -> Generator[None, Any, None]:
+    """Provide the DI build project incl. assets."""
     make_new_project(PROJECT_NAME)
     make_new_dataset(
         project_name=PROJECT_NAME,
@@ -35,16 +41,17 @@ def setup(request):
             file_resource=response_file,
             replace=True,
         )
-
-    request.addfinalizer(lambda: delete_project(PROJECT_NAME))
+    yield None
+    delete_project(PROJECT_NAME)
 
 
 @needs_cmem
-def test_integration_placeholder(setup):
+@pytest.mark.usefixtures("setup")
+def test_integration_placeholder() -> None:
     """Placeholder to write integration testcase with cmem"""
     with get_resource_response(PROJECT_NAME, RESOURCE_NAME) as response:
         assert response.text != ""
 
 
-def test_dummy():
+def test_dummy() -> None:
     """Dummy test to avoid pytest to run amok in case no cmem is available."""
