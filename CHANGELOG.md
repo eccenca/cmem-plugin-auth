@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [4.1.0] 2026-08-04
+
+### Changed
+
+- Updated dependencies and template
+- Exchanged cmempy dependent code with cmem-client equivalent
+
 ## [4.0.0] 2024-10-16
 
 ### Changed
