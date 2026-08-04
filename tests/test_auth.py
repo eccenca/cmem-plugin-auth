@@ -1,17 +1,17 @@
 """Plugin tests."""
 
-import io
 import os
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any
 
 import pytest
-from cmem.cmempy.workspace.projects.datasets.dataset import make_new_dataset
-from cmem.cmempy.workspace.projects.project import delete_project, make_new_project
-from cmem.cmempy.workspace.projects.resources.resource import (
-    create_resource,
-    get_resource_response,
-)
+from cmem.cmempy.workspace.projects.resources.resource import get_resource_response
+from cmem_client.models.dataset import Dataset, DatasetData
+from cmem_client.models.project import Project
+from cmem_client.repositories.protocols.import_item import ImportConflictPolicy
+from cmem_plugin_base.dataintegration.client import get_client
+from cmem_plugin_base.testing import TestExecutionContext
 
 needs_cmem = pytest.mark.skipif(
     os.environ.get("CMEM_BASE_URI", "") == "", reason="Needs CMEM configuration"
@@ -24,25 +24,29 @@ DATASET_TYPE = "text"
 
 
 @pytest.fixture
-def setup() -> Generator[None, Any, None]:
+def setup(tmp_path: Path) -> Generator[None, Any]:
     """Provide the DI build project incl. assets."""
-    make_new_project(PROJECT_NAME)
-    make_new_dataset(
-        project_name=PROJECT_NAME,
-        dataset_name=DATASET_NAME,
-        dataset_type=DATASET_TYPE,
-        parameters={"file": RESOURCE_NAME},
-        autoconfigure=False,
+    client = get_client(TestExecutionContext())
+
+    project = Project(name=PROJECT_NAME)
+    client.projects.create_item(project)
+
+    dataset = Dataset(
+        id=DATASET_NAME,
+        project_id=PROJECT_NAME,
+        data=DatasetData(type=DATASET_TYPE, parameters={"file": RESOURCE_NAME}),
     )
-    with io.StringIO("auth plugin sample file.") as response_file:
-        create_resource(
-            project_name=PROJECT_NAME,
-            resource_name=RESOURCE_NAME,
-            file_resource=response_file,
-            replace=True,
-        )
+    client.datasets.create_item(dataset)
+
+    resource_file = tmp_path / RESOURCE_NAME
+    resource_file.write_text("auth plugin sample file.")
+    client.files.import_item(
+        path=resource_file,
+        key=f"{PROJECT_NAME}:{RESOURCE_NAME}",
+        on_conflict=ImportConflictPolicy.REPLACE,
+    )
     yield None
-    delete_project(PROJECT_NAME)
+    client.projects.delete_item(PROJECT_NAME)
 
 
 @needs_cmem
