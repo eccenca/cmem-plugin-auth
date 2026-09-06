@@ -100,7 +100,7 @@ OAUTH_TOKEN_DESCRIPTION = f"""This is the {OIDC} token endpoint location
 class OAuth2(WorkflowPlugin):
     """Workflow Plugin: Generate oauth access token"""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913 PLR0917
         self,
         oauth_grant_type: str,
         oauth_token_url: str,
